@@ -116,34 +116,10 @@ while not done:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 done = True
-        """ - commented out while testing alternate movement
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-            print("Left key pressed")
-            player.xspeed = -5
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-            print("Right key pressed")
-            player.xspeed = 5
-        if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
-            if not (event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT):
-                print("Left key unpressed")
-                player.xspeed = 0
-        if event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
-            if not (event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT):
-                print("Right key unpressed")
-                player.xspeed = 0
-        """
-        
+
     #clear screen
     screen.fill(WHITE)
 
-    """ - commented out to test movement
-    #Implementing mouse controls
-    pos = pygame.mouse.get_pos() #sets pos to a list of the mouse coordinates
-
-    #setting the player's coordinates to the mouse coordinates
-    player.rect.x = pos[0] - 16 #-16 to account for player size
-    player.rect.y = pos[1] - 16 #-16 to account for player size
-    """
     #Resetting values each time the loop runs - experiment with putting the
     #whole movement code into the update function and swapping "player.******"
     #for "self.******"
