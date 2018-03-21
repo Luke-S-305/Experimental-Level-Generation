@@ -1,0 +1,194 @@
+#Importing modules needed
+import pygame
+import random
+
+#Defining colours
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+RED = (255,0,0)
+GREEN = (0,255,0)
+BLUE = (0,0,255)
+
+#Defining classes - pg229
+class Block(pygame.sprite.Sprite):
+    #Constructor
+    def __init__(self, colour, width, height):
+    
+        #Calls the constructor within itself, initialising the sprite
+        super().__init__()
+
+        #Setting colours
+        self.image = pygame.Surface([32,32]) #Creates a blank image
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE) #Makes white a transparent colour so the background shows
+
+        #Drawing the shape
+        pygame.draw.rect(self.image, colour, [0, 0, 32, 32])
+
+        #Create the rectangle object which has the dimensions of the image
+        #The position of the object can then be updated with rect.x and rect.y
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        #this will be put in the main loop and run once every second
+        self.rect.y -= 0 #was previously set to 1 tests are being made without movement
+
+class Player(pygame.sprite.Sprite):
+    #Constructor
+    def __init__(self, colour, width, height, xspeed, yspeed):
+    
+        #Calls the constructor within itself, initialising the sprite
+        super().__init__()
+
+        #Setting colours
+        self.image = pygame.Surface([32,32]) #Creates a blank image
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE) #Makes white a transparent colour so the background shows
+
+        #test setup for xspeed
+        self.xspeed = 0
+        self.yspeed = 0
+        
+        #Drawing the shape
+        pygame.draw.ellipse(self.image, colour, [0, 0, 32, 32])
+
+        #Create the rectangle object which has the dimensions of the image
+        #The position of the object can then be updated with rect.x and rect.y
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        self.rect.x += self.xspeed * speed #move x position by xspeed
+        if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
+            self.rect.y += 1
+            
+            
+#Initialising pygame
+pygame.init()
+
+#Set screen dimensions
+screen_width = 1280
+screen_height = 640
+screen = pygame.display.set_mode([screen_width, screen_height])
+
+#The "block list" is a list of all the block sprites. All blocks in the program are added to this list
+block_list = pygame.sprite.Group()
+
+#Another list of every sprite as well
+all_sprites_list = pygame.sprite.Group()
+
+#Another list of all players
+player_list = pygame.sprite.Group()
+
+#Creating a dirt floor
+#For loop for multiple blocks
+for i in range(40):
+    #creating the block
+    dirtBlock = Block(BLACK, 32, 32)
+
+    #Placing blocks
+    dirtBlock.rect.x = i * 32
+    dirtBlock.rect.y = 640 - 32
+
+    #Adding the block to the object lists
+    block_list.add(dirtBlock)
+    all_sprites_list.add(dirtBlock)
+
+#Creating some form of player
+player = Player(RED, 32, 32, 0, 0) #The 0, 0 at the end is xspeed and yspeed
+player.rect.y = 0
+player.rect.x = 0
+player_list.add(player)
+all_sprites_list.add(player)
+
+#Loop until closed
+done = False
+
+#Setting screen update speed
+clock = pygame.time.Clock()
+score = 0
+
+#-----Main program loop-----
+while not done:
+    for event in pygame.event.get():
+        #Adding events including keypresses
+        if event.type == pygame.QUIT:
+            done = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                done = True
+        """ - commented out while testing alternate movement
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            print("Left key pressed")
+            player.xspeed = -5
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            print("Right key pressed")
+            player.xspeed = 5
+        if event.type == pygame.KEYUP and event.key == pygame.K_LEFT:
+            if not (event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT):
+                print("Left key unpressed")
+                player.xspeed = 0
+        if event.type == pygame.KEYUP and event.key == pygame.K_RIGHT:
+            if not (event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT):
+                print("Right key unpressed")
+                player.xspeed = 0
+        """
+        
+    #clear screen
+    screen.fill(WHITE)
+
+    """ - commented out to test movement
+    #Implementing mouse controls
+    pos = pygame.mouse.get_pos() #sets pos to a list of the mouse coordinates
+
+    #setting the player's coordinates to the mouse coordinates
+    player.rect.x = pos[0] - 16 #-16 to account for player size
+    player.rect.y = pos[1] - 16 #-16 to account for player size
+    """
+    #Resetting values each time the loop runs - experiment with putting the
+    #whole movement code into the update function and swapping "player.******"
+    #for "self.******"
+    player.xspeed = 0
+    player.yspeed = 0
+    speed = 1
+
+    if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+        speed = 2
+
+
+    # get key current state - keystate polling (https://stackoverflow.com/questions/13378846/pygame-how-to-make-smoother-movements)
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player.xspeed = -1
+    if keys[pygame.K_RIGHT]:
+        player.xspeed = 1
+    if keys[pygame.K_UP]:
+        player.yspeed = -1
+    if keys[pygame.K_DOWN]:
+        player.yspeed = 1
+
+    #detecting collisions
+    blocks_hit_list = pygame.sprite.spritecollide(player, block_list, False)#The boolean at the end is a "dokill". it determines whether the sprite is destroyes
+
+    """ - commented out as blocks are no longer removed on collisions
+    #log actual collisions in the form of score
+    for dirtBlock in blocks_hit_list: #Goes through all of the dirt blocks which are touching the player
+        score +=1 #add one for each block
+        print("Score: ", score)
+    """
+        
+    #update sprites
+    print(player.xspeed) #test print
+    block_list.update()
+    player_list.update()
+    
+    #Draw sprites
+    all_sprites_list.draw(screen)
+
+    #Set framerate to 60fps
+    clock.tick(60)
+
+    #Flip screen and update
+    pygame.display.flip()
+
+#Closes program when the loop finishes
+pygame.quit()
