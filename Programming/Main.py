@@ -61,7 +61,7 @@ class Player(pygame.sprite.Sprite):
         #whole movement code into the update function and swapping "player.******"
         #for "self.******"
         self.xspeed = 0
-        self.yspeed = 0
+        #self.yspeed = 0 - commented out as it is resetting fall speed to 0 every update
         speed = 1
 
         #increasing the speed value if shift is pressed
@@ -81,10 +81,17 @@ class Player(pygame.sprite.Sprite):
             self.yspeed = 1
 
         #move x position by xspeed
-        self.rect.x += self.xspeed * speed 
+        self.rect.x += self.xspeed * speed
+        #move y position by yspeed
+        print(self.yspeed)
+        self.rect.y += self.yspeed
         if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
-            self.rect.y += 1
+            self.yspeed += 0.3 * gravity
+            #note that if yspeed is negative (object falling) change to the falling sprite
             
+        #if there is a collision with a block, stop falling
+        elif blocks_hit_list:
+            self.yspeed = 0
             
 #Initialising pygame
 pygame.init()
@@ -123,6 +130,9 @@ player.rect.y = 0
 player.rect.x = 0
 player_list.add(player)
 all_sprites_list.add(player)
+
+#setting gravity
+gravity = 1
 
 #Loop until closed
 done = False
