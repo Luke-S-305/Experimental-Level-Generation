@@ -57,7 +57,31 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self):
-        self.rect.x += self.xspeed * speed #move x position by xspeed
+        #Resetting values each time the loop runs - experiment with putting the
+        #whole movement code into the update function and swapping "player.******"
+        #for "self.******"
+        self.xspeed = 0
+        self.yspeed = 0
+        speed = 1
+
+        #increasing the speed value if shift is pressed
+        if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+            speed = 2
+
+
+        # get key current state - keystate polling (https://stackoverflow.com/questions/13378846/pygame-how-to-make-smoother-movements)
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.xspeed = -1
+        if keys[pygame.K_RIGHT]:
+            self.xspeed = 1
+        if keys[pygame.K_UP]:
+            self.yspeed = -1
+        if keys[pygame.K_DOWN]:
+            self.yspeed = 1
+
+        #move x position by xspeed
+        self.rect.x += self.xspeed * speed 
         if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
             self.rect.y += 1
             
@@ -120,30 +144,8 @@ while not done:
     #clear screen
     screen.fill(WHITE)
 
-    #Resetting values each time the loop runs - experiment with putting the
-    #whole movement code into the update function and swapping "player.******"
-    #for "self.******"
-    player.xspeed = 0
-    player.yspeed = 0
-    speed = 1
-
-    if pygame.key.get_mods() & pygame.KMOD_SHIFT:
-        speed = 2
-
-
-    # get key current state - keystate polling (https://stackoverflow.com/questions/13378846/pygame-how-to-make-smoother-movements)
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player.xspeed = -1
-    if keys[pygame.K_RIGHT]:
-        player.xspeed = 1
-    if keys[pygame.K_UP]:
-        player.yspeed = -1
-    if keys[pygame.K_DOWN]:
-        player.yspeed = 1
-
     #detecting collisions
-    blocks_hit_list = pygame.sprite.spritecollide(player, block_list, False)#The boolean at the end is a "dokill". it determines whether the sprite is destroyes
+    blocks_hit_list = pygame.sprite.spritecollide(player, block_list, False) #The boolean at the end is a "dokill". it determines whether the sprite is destroyes
 
     """ - commented out as blocks are no longer removed on collisions
     #log actual collisions in the form of score
@@ -153,7 +155,6 @@ while not done:
     """
         
     #update sprites
-    print(player.xspeed) #test print
     block_list.update()
     player_list.update()
     
