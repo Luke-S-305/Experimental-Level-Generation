@@ -12,7 +12,7 @@ BLUE = (0,0,255)
 #Defining classes - pg229
 class Block(pygame.sprite.Sprite):
     #Constructor
-    def __init__(self, colour, width, height):
+    def __init__(self, colour, width, height, placementx, placementy):
     
         #Calls the constructor within itself, initialising the sprite
         super().__init__()
@@ -31,8 +31,10 @@ class Block(pygame.sprite.Sprite):
 
     def update(self):
         #this will be put in the main loop and run once every second
-        self.rect.y -= 0 #was previously set to 1 tests are being made without movement
-
+        #the code for placing a block using scrollx is "currentscrollx + blocksize * integer(which is multiplied by blocksize to give position)
+        self.rect.x = scrollx + self.placementx #placementx is where it is placed
+        self.rect.y = scrolly + self.placementy #placementy is where it is placed
+        
 class Player(pygame.sprite.Sprite):
     #Constructor
     def __init__(self, colour, width, height, xspeed, yspeed):
@@ -75,6 +77,18 @@ class Player(pygame.sprite.Sprite):
 
         # get key current state - keystate polling (https://stackoverflow.com/questions/13378846/pygame-how-to-make-smoother-movements)
         keys = pygame.key.get_pressed()
+        global scrollx
+        global scrolly
+
+        if keys[pygame.K_LEFT]:
+            scrollx += 1
+        if keys[pygame.K_RIGHT]:
+            scrollx += -1
+        if keys[pygame.K_UP]:
+            scrolly += 1
+        if keys[pygame.K_DOWN]:
+            scrolly += -1
+        """ - commented out for the time being
         if keys[pygame.K_LEFT]:
             self.xspeed = -1
         if keys[pygame.K_RIGHT]:
@@ -96,13 +110,14 @@ class Player(pygame.sprite.Sprite):
         if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
             self.yspeed += 0.4 * gravity
             #note that if yspeed is negative (object falling) change to the falling sprite
-            
+        
         #if there is a collision with a block, stop falling
         elif blocks_hit_list:
             #only set yspeed to 0 if the object is falling
             if self.yspeed > 0:
                 self.yspeed = 0
-            
+        """
+        
 #Initialising pygame
 pygame.init()
 
@@ -110,6 +125,12 @@ pygame.init()
 screen_width = 1280
 screen_height = 640
 screen = pygame.display.set_mode([screen_width, screen_height])
+
+#defining some variables
+global scrollx
+scrollx = 0
+global scrolly
+scrolly = 0
 
 #The "block list" is a list of all the block sprites. All blocks in the program are added to this list
 block_list = pygame.sprite.Group()
@@ -124,11 +145,16 @@ player_list = pygame.sprite.Group()
 #For loop for multiple blocks
 for i in range(40):
     #creating the block
-    dirtBlock = Block(BLACK, 64, 64)
+    dirtBlock = Block(BLACK, 64, 64,64*i, 0)#the last 2 parameters are the (scroll) x and y placements)
 
     #Placing blocks
+    dirtBlock.placementx = 64 * i
+    dirtBlock.placementy = screen_height - 64 #this puts the blocks just above the bottom of the screen
+    #CAREFUL ABOUT THIS CODE ABOVE FOR RESIZING THE WINDOW
+    """ old placement code
     dirtBlock.rect.x = i * 64
     dirtBlock.rect.y = 640 - 64
+    """
 
     #Adding the block to the object lists
     block_list.add(dirtBlock)
