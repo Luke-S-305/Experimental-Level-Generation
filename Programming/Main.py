@@ -18,12 +18,12 @@ class Block(pygame.sprite.Sprite):
         super().__init__()
 
         #Setting colours
-        self.image = pygame.Surface([32,32]) #Creates a blank image
+        self.image = pygame.Surface([64,64]) #Creates a blank image
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE) #Makes white a transparent colour so the background shows
 
         #Drawing the shape
-        pygame.draw.rect(self.image, colour, [0, 0, 32, 32])
+        pygame.draw.rect(self.image, colour, [0, 0, 64, 64])
 
         #Create the rectangle object which has the dimensions of the image
         #The position of the object can then be updated with rect.x and rect.y
@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         #Setting colours
-        self.image = pygame.Surface([32,32]) #Creates a blank image
+        self.image = pygame.Surface([64,64]) #Creates a blank image, the actual hitbpx
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE) #Makes white a transparent colour so the background shows
 
@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.yspeed = 0
         
         #Drawing the shape
-        pygame.draw.ellipse(self.image, colour, [0, 0, 32, 32])
+        pygame.draw.ellipse(self.image, colour, [0, 0, 64, 64]) #he visual image
 
         #Create the rectangle object which has the dimensions of the image
         #The position of the object can then be updated with rect.x and rect.y
@@ -60,6 +60,10 @@ class Player(pygame.sprite.Sprite):
         #Resetting values each time the loop runs - experiment with putting the
         #whole movement code into the update function and swapping "player.******"
         #for "self.******"
+        """
+        Use the data from line 77 onwards (depth of collision)
+        This will allow me to 
+        """
         self.xspeed = 0
         #self.yspeed = 0 - commented out as it is resetting fall speed to 0 every update
         speed = 1
@@ -76,7 +80,11 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT]:
             self.xspeed = 1
         if keys[pygame.K_UP]:
-            self.yspeed = -1
+            if blocks_hit_list:
+                self.yspeed -= 3
+            else:
+                self.yspeed += 0.1
+            #self.yspeed = -1
         if keys[pygame.K_DOWN]:
             self.yspeed = 1
 
@@ -86,12 +94,14 @@ class Player(pygame.sprite.Sprite):
         print(self.yspeed)
         self.rect.y += self.yspeed
         if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
-            self.yspeed += 0.3 * gravity
+            self.yspeed += 0.4 * gravity
             #note that if yspeed is negative (object falling) change to the falling sprite
             
         #if there is a collision with a block, stop falling
         elif blocks_hit_list:
-            self.yspeed = 0
+            #only set yspeed to 0 if the object is falling
+            if self.yspeed > 0:
+                self.yspeed = 0
             
 #Initialising pygame
 pygame.init()
@@ -114,11 +124,11 @@ player_list = pygame.sprite.Group()
 #For loop for multiple blocks
 for i in range(40):
     #creating the block
-    dirtBlock = Block(BLACK, 32, 32)
+    dirtBlock = Block(BLACK, 64, 64)
 
     #Placing blocks
-    dirtBlock.rect.x = i * 32
-    dirtBlock.rect.y = 640 - 32
+    dirtBlock.rect.x = i * 64
+    dirtBlock.rect.y = 640 - 64
 
     #Adding the block to the object lists
     block_list.add(dirtBlock)
