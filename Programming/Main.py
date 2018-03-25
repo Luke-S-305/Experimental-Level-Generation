@@ -59,12 +59,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self):
-        #Resetting values each time the loop runs - experiment with putting the
-        #whole movement code into the update function and swapping "player.******"
-        #for "self.******"
         """
-        Use the data from line 77 onwards (depth of collision)
-        This will allow me to 
+        Try implementing this collision code
+        https://stackoverflow.com/questions/44721130/pygame-collision-detection-with-walls
         """
         self.xspeed = 0
         #self.yspeed = 0 - commented out as it is resetting fall speed to 0 every update
@@ -81,13 +78,17 @@ class Player(pygame.sprite.Sprite):
         global scrolly
 
         if keys[pygame.K_LEFT]:
-            scrollx += 1
+            scrollx += 5
         if keys[pygame.K_RIGHT]:
-            scrollx += -1
+            scrollx += -5
         if keys[pygame.K_UP]:
-            scrolly += 1
+            scrolly += 5
         if keys[pygame.K_DOWN]:
-            scrolly += -1
+            scrolly += -5
+
+        if not blocks_hit_list: #check whether "blocks_hit_list" the list of collisions is empty
+            scrolly += -1 * gravity
+        
         """ - commented out for the time being
         if keys[pygame.K_LEFT]:
             self.xspeed = -1
@@ -143,7 +144,7 @@ player_list = pygame.sprite.Group()
 
 #Creating a dirt floor
 #For loop for multiple blocks
-for i in range(40):
+for i in range(20):
     #creating the block
     dirtBlock = Block(BLACK, 64, 64,64*i, 0)#the last 2 parameters are the (scroll) x and y placements)
 
@@ -162,8 +163,9 @@ for i in range(40):
 
 #Creating some form of player
 player = Player(RED, 32, 32, 0, 0) #The 0, 0 at the end is xspeed and yspeed
-player.rect.y = 0
-player.rect.x = 0
+#placing the player in the middle of the screen
+player.rect.y = screen_height/2 - 32
+player.rect.x = screen_width/2 - 32
 player_list.add(player)
 all_sprites_list.add(player)
 
