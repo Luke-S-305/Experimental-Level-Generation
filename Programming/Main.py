@@ -8,6 +8,98 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 GREEN = (0,255,0)
 BLUE = (0,0,255)
+BROWN = (139,69,19)
+GRAY = (119,136,153)
+
+#Defining functions
+def randBool(chance):
+    return random.random() < chance
+
+def generateMap(mapLength, mapHeight):
+    #define 2d array first - the mapHeight and mapLength must be reversed to work
+    square = [[0 for x in range(mapHeight+1)] for y in range(mapLength+1)]
+    #Then assign values to each
+    for j in range(mapHeight):
+        for i in range(mapLength):
+            if i == 0 or i == mapLength-1:
+                square[i][j] = "border"
+            elif j == 0 or j == mapHeight-1:
+                square[i][j] = "border"
+            elif j <= mapHeight/4:
+                square[i][j] = "air"
+            else:
+                #defining the chance of there being a block or air
+                blockChance = 0.1
+                #Defining the chance of there being dirt or a stone
+                stoneChance = 0.25
+                """
+                This code is designed to check the blocks around it and
+                see whether they are air or not. The blocks around it being
+                air increases the chance of the blocks near to it becoming air.
+                This is to create tunnels in the ground for the player to travel
+                through.
+                """
+
+                if square[i-1][j-1] == "air" and (i-1 != -1) and (j-1 != -1):
+                    blockChance += 0.15
+                if square[i][j-1] == "air" and (j-1 != -1):
+                    blockChance += 0.15
+                if (i+1 <= mapLength) and (j-1 != -1):
+                    if square[i+1][j-1] == "air":
+                        blockChance += 0.15
+                if square[i-1][j] == "air" and (i-1 != -1):
+                    blockChance += 0.15
+                if not randBool(blockChance):
+                    square[i][j] = "air"
+                elif randBool(stoneChance):
+                    square[i][j] = "stone"
+                else:
+                    square[i][j] = "dirt"
+                
+    for j in range(mapHeight):
+        for i in range(mapLength):
+            if square[i][j] == "border":
+                borderBlock = Block(BLACK, 64, 64,64*i,64*j)#the last 2 parameters are the (scroll) x and y placements)
+
+                #Placing blocks - possibly redundant
+                borderBlock.placementx = 64 * i
+                borderBlock.placementy = 64 * j
+                #CAREFUL ABOUT THIS CODE ABOVE FOR RESIZING THE WINDOW
+    
+                #Adding the block to the object lists
+                block_list.add(borderBlock)
+                all_sprites_list.add(borderBlock)
+                
+            elif square[i][j] == "dirt":
+                dirtBlock = Block(BROWN, 64, 64,64*i,64*j)#the last 2 parameters are the (scroll) x and y placements)
+
+                #Placing blocks - possibly redundant
+                dirtBlock.placementx = 64 * i
+                dirtBlock.placementy = 64 * j
+                #CAREFUL ABOUT THIS CODE ABOVE FOR RESIZING THE WINDOW
+    
+                #Adding the block to the object lists
+                block_list.add(dirtBlock)
+                all_sprites_list.add(dirtBlock)
+
+            elif square[i][j] == "stone":
+                stoneBlock = Block(GRAY, 64, 64,64*i,64*j)#the last 2 parameters are the (scroll) x and y placements)
+
+                #Placing blocks - possibly redundant
+                stoneBlock.placementx = 64 * i
+                stoneBlock.placementy = 64 * j
+                #CAREFUL ABOUT THIS CODE ABOVE FOR RESIZING THE WINDOW
+    
+                #Adding the block to the object lists
+                block_list.add(stoneBlock)
+                all_sprites_list.add(stoneBlock)
+
+            """  
+            elif square[i][j] == "air":
+                #do nothing
+            """
+
+
 
 #Defining classes - pg229
 class Block(pygame.sprite.Sprite):
@@ -144,6 +236,8 @@ player_list = pygame.sprite.Group()
 
 #Creating a dirt floor
 #For loop for multiple blocks
+generateMap(80,80)
+"""
 for i in range(20):
     #creating the block
     dirtBlock = Block(BLACK, 64, 64,64*i, 0)#the last 2 parameters are the (scroll) x and y placements)
@@ -152,15 +246,11 @@ for i in range(20):
     dirtBlock.placementx = 64 * i
     dirtBlock.placementy = screen_height - 64 #this puts the blocks just above the bottom of the screen
     #CAREFUL ABOUT THIS CODE ABOVE FOR RESIZING THE WINDOW
-    """ old placement code
-    dirtBlock.rect.x = i * 64
-    dirtBlock.rect.y = 640 - 64
-    """
 
     #Adding the block to the object lists
     block_list.add(dirtBlock)
     all_sprites_list.add(dirtBlock)
-
+"""
 #Creating some form of player
 player = Player(RED, 32, 32, 0, 0) #The 0, 0 at the end is xspeed and yspeed
 #placing the player in the middle of the screen
